@@ -217,3 +217,5 @@ if __name__ == '__main__':
             print("ERROR: Failed to log in. Check your DISCORD_BOT_TOKEN.")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
+
+# Required perms integer: 412317240384
