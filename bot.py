@@ -1,3 +1,4 @@
+import json
 import datetime
 print("After datetime import")
 import os
@@ -30,8 +31,28 @@ print(f"Bot command tree before tree initialization: {getattr(bot, 'tree', 'No t
 # **Create your own help command:** Define a new command with the name `help` using the `@bot.command()` decorator. Inside this command function, you can manually create and send the help message using `await ctx.send()` or by embedding the information in a more visually appealing way using `discord.Embed`.
 # Event: Bot is ready and connected to Discord
 @bot.event
-async def on_ready():
+async def setup_hook():
     print("Running setup_hook...")
+    await load_prefixes() # Load prefixes when the bot starts
+    print("Setup hook finished.")
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name} ({bot.user.id})')
+    print('------')
+
+
+# Dictionary to store custom prefixes per guild
+guild_prefixes = {}
+PREFIXES_FILE = 'prefixes.json'
+
+async def load_prefixes():
+    try:
+        with open(PREFIXES_FILE, 'r') as f:
+            global guild_prefixes
+            guild_prefixes = json.load(f)
+    except FileNotFoundError:
+        guild_prefixes = {} # Initialize empty if file not found
 @bot.command(name='hello')
 async def hello(ctx):
     """Responds with a greeting."""
@@ -53,27 +74,24 @@ async def time(ctx):
 @commands.has_guild_permissions(manage_guild=True)
 async def prefix(ctx, new_prefix: str):
     """Changes the bot's command prefix (Manage Server permission required)."""
-    bot.command_prefix = new_prefix
-    await ctx.send(f'The command prefix has been changed to `{new_prefix}`')
+    guild_prefixes[str(ctx.guild.id)] = new_prefix
+    save_prefixes() # Save prefixes after changing
+    await ctx.send(f'The command prefix for this server has been changed to `{new_prefix}`')
 
 @bot.command(name='shutdown')
 async def shutdown(ctx):
     """Shuts down the bot (owner only)."""
     allowed_user_id = 978055148091867157  # Your Discord user ID
     if ctx.author.id == allowed_user_id:
-        for guild in bot.guilds:
-            for channel in guild.channels:
-                if isinstance(channel, discord.TextChannel) and guild.me.permissions_in(channel).send_messages:
-                    try:
-                        await channel.send("Bot is shutting down in 5 minutes for maintenance.")
-                        break  # Move to the next guild after sending the message
-                    except:
-                        continue # Try the next channel if sending fails
-        await ctx.send("Broadcasting shutdown message and initiating shutdown in 5 minutes.")
-        await asyncio.sleep(300)  # Wait for 5 minutes
+        save_prefixes() # Save prefixes before shutting down
+        await ctx.send("Shutting down bot...")
         await bot.close()
     else:
         await ctx.send("You do not have permission to shut down the bot.")
+
+def save_prefixes():
+    with open(PREFIXES_FILE, 'w') as f:
+        json.dump(guild_prefixes, f, indent=4)
 
 # Disable the default help command when initializing the bot
 #bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
@@ -112,7 +130,6 @@ async def custom_help(ctx, command_name: str = None):
         help_message += "- indubitably\n"
         help_message += "- indeed\n"
         help_message += "- :skull:\n"
-        help_message += "- 💀\n"
         help_message += "- rip arkansas\n"
         help_message += "- trains\n"
         help_message += "- <@978055148091867157>\n"
@@ -123,17 +140,19 @@ async def custom_help(ctx, command_name: str = None):
 @bot.event
 async def on_message(message):
     # Ignore messages sent by the bot itself to prevent infinite loops
-    if message.author == bot.user:
+    if message.author == bot.user or message.author.bot:
         return
 
-    # Process commands first. If this message is a command,
-    # bot.process_commands will handle it and we can return early.
-    await bot.process_commands(message)
+    # Get the prefix for the current guild
+    prefix = guild_prefixes.get(str(message.guild.id), '!') # Default to '!' if no prefix is set
 
-    # If the message was a command, we stop processing here to avoid
-    # triggering other on_message logic for commands.
-    if message.content.startswith(bot.command_prefix):
-        return
+    # Check if the message starts with the guild-specific prefix
+    if message.content.startswith(prefix):
+        # Manually process the command with the correct prefix
+        ctx = await bot.get_context(message)
+        if ctx.command:
+            await bot.invoke(ctx)
+            return # Stop processing if it was a command
 
     # If the message is not a command, continue with other on_message logic.
     # Check if the message contains the word "yaya" (case-insensitive)
@@ -186,7 +205,6 @@ https://youtu.be/l-UDFCULlzE?si=L71H0wOKCNge7wVG""")
     if "<@978055148091867157>" in message.content.lower():
         await message.channel.send("https://cdn.discordapp.com/attachments/1296624229239881760/1338685439602856008/ezgif.com-animated-gif-maker_1.gif?ex=68346eb8&is=68331d38&hm=dcc37c42f7b3a020874f3abadb74aa7ee131482f23530d5c0e5aa448c92503fa&")
 
-    
 
 @bot.command(name='restart')
 async def restart(ctx):
@@ -200,11 +218,6 @@ async def restart(ctx):
     if "trigger" in message.content.lower():
         await message.channel.send("response")
 
-
-    # Add any other non-command message processing logic here.
-
-    # This line is important! It allows your commands (like !ping) to still work
-    await bot.process_commands(message)
 
 # Main entry point to run the bot
 if __name__ == '__main__':
