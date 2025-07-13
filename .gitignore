@@ -12,3 +12,6 @@ __pycache__/
 
 # Log files
 *.log
+
+# Bot secrets and public no-noes
+*do_not_commit
