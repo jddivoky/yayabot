@@ -1,0 +1,3 @@
+source .venv/bin/activate
+export DISCORD_BOT_TOKEN="MTM3NjIzNTg0ODE3NzAyNTExNg.GTpTlb.lBHkm5vBAoGlHw8p6PvGSPDF6rm4AapTRg_LWg"
+python bot.py
