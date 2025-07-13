@@ -23,7 +23,7 @@ intents.message_content = True
 print("After intents setup")
 
 # Initialize the bot with a command prefix and intents
-bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+bot = commands.Bot(command_prefix='.', intents=intents, help_command=None)
 print("After bot initialization")
 print(f"Bot command tree before tree initialization: {getattr(bot, 'tree', 'No tree attribute')}")
 
