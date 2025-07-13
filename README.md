@@ -1,3 +1,4 @@
+# [Invite Link](https://discord.com/oauth2/authorize?client_id=1376235848177025116)
 
 # yayabot
 This is just a fun bot I made for me and my friends :D.
