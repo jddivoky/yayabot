@@ -1,1 +1,14 @@
 .venv
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Environment variables file (adjust if you use a different name)
+.env
+
+# IDE specific files
+.vscode/
+
+# Log files
+*.log
