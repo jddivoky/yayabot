@@ -6,6 +6,7 @@ Feel free to add it to your server.
 ## Basic use
 yayabot isn't really a general purpose bot, it really just responds to certain triggers with memes, images, and gifs.
 - To see said triggers, type `.help`.
+- Also, yayabot does **not** support slash commands right now, I removed them due to too many issues.
 - The prefix for yayabot is `.` (a period/full stop). Sorry for any conflicts this may cause. I had lots of problems with custom prefixes.
 ##### If you have any suggestions for unpopular prefixes that are still easy to type, let me know.
 ## Support/Suggestions
