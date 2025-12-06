@@ -19,3 +19,4 @@ There are a few different options for support. You can:
 
 # Other notes
 THERE ARE NO OTHER OFFICIAL YAYABOT WEBSITES OR CONTACT METHODS. ANY OTHERS YOU SEE ARE EITHER FAKE, OR REPRESENTING A DIFFERENT PRODUCT.
+You can clone, fork, whatever to this code, so you can make it your own. All I ask is that you credit me for the work I did.
